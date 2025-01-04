@@ -32,7 +32,7 @@
         "slack_redist_iter": "00000000000000000000000000000000",
         "timing_driven": "00000000000000000000000000000001",
         "target_freq": "12000000.000000",
-        "cst.filename": "constraints.ucf",
+        "cst.filename": "src/ucf/counter.ucf",
         "packer.partno": "GW2AR-LV18QN88C8/I7",
         "packer.chipdb": "GW2A-18C",
         "packer.arch": "himbaechel/gowin"

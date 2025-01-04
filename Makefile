@@ -20,21 +20,14 @@ APYCULA = gowin_pack
 DEVICE = GW2AR-LV18QN88C8/I7
 DEV_FAMILY = GW2A-18C
 
-.PHONY: all simulate synthesize
 
 # Default target: Runs both simulate and synthesize
-all: commands synthesize flash
+all: compile synthesize flash
 
-ee:
-	nextpnr-himbaechel --json outputs/synth/counter_synth.json \
-                   --write pnrblinky.json \
-                   --device $(DEVICE) \
-                   --vopt family=GW2A-18C \
-                   --vopt cst=constraints.ucf
 # Simulation target
 compile:
 	@echo "Compiling and simulating Verilog testbench..."
-	$(IVERILOG) -g2009 -o outputs/compiled/$(OUT_FILE) src/modules/$(FILE)
+	$(IVERILOG) -g2009 -o outputs/compiled/$(OUT_FILE) src/tests/$(TESTBENCH) -I src/modules 
 	$(VVP) outputs/compiled/$(OUT_FILE)
 
 
@@ -47,7 +40,7 @@ synthesize:
                    --write outputs/routed/$(SYNTH_FILE) \
                    --device $(DEVICE) \
 				   --vopt family=$(DEV_FAMILY)\
-                   --vopt cst=constraints.ucf
+                   --vopt cst=src/ucf/$(FILE:.sv=).ucf
 	@echo "Generating bitstream with apycula..."
 	$(APYCULA)  -d $(DEV_FAMILY)  -o outputs/bin/$(BINARY_FILE) outputs/routed/$(SYNTH_FILE)
 
