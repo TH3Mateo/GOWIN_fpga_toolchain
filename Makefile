@@ -7,7 +7,8 @@ FILE?= counter.sv
 OUT_FILE = $(FILE:.sv=)_out.vvp
 # append the TESTBENCH variable with _out
 TESTBENCH = $(FILE:.sv=)_tb.sv
-SYNTH_FILE = $(FILE:.sv=)_synth.sv
+SYNTH_JSON = $(FILE:.sv=)_synth.json
+SYNTH_SV = $(FILE:.sv=)_synth.sv
 BINARY_FILE = $(FILE:.sv=)_bin.fs
 
 # Tools
@@ -34,15 +35,21 @@ compile:
 # Synthesis, place-and-route, and bitstream generation target
 synthesize:
 	@echo "Running Yosys synthesis..."
-	$(YOSYS) -p "synth_gowin  -json outputs/synth/$(SYNTH_FILE)" src/modules/$(FILE)
+	$(YOSYS) -p "synth_gowin  -json outputs/synth/$(SYNTH_JSON)" src/modules/$(FILE)
 	@echo "Running nextpnr for place-and-route..."
-	$(NEXTPNR) --json outputs/synth/$(SYNTH_FILE) \
-                   --write outputs/routed/$(SYNTH_FILE) \
+	$(NEXTPNR) --json outputs/synth/$(SYNTH_JSON) \
+                   --write outputs/routed/$(SYNTH_JSON) \
                    --device $(DEVICE) \
 				   --vopt family=$(DEV_FAMILY)\
                    --vopt cst=src/ucf/$(FILE:.sv=).ucf
 	@echo "Generating bitstream with apycula..."
-	$(APYCULA)  -d $(DEV_FAMILY)  -o outputs/bin/$(BINARY_FILE) outputs/routed/$(SYNTH_FILE)
+	$(APYCULA)  -d $(DEV_FAMILY)  -o outputs/bin/$(BINARY_FILE) outputs/routed/$(SYNTH_JSON)
+
+simulate:
+	@echo "Simulating the design..."
+	yosys -o outputs/synth/$(SYNTH_SV) outputs/synth/$(SYNTH_JSON) 
+	iverilog -o outputs/compiled/$(OUT_FILE) -D POST_SYNTHESIS src/tests/$(TESTBENCH)  outputs/synth/$(SYNTH_SV) `yosys-config --datdir/gowin/cells_sim.v`
+	vvp 
 
 view:
 	gtkwave outputs/sim/$(FILE:.sv=)_data.vcd --script=commands.tcl
