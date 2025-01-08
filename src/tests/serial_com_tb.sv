@@ -1,0 +1,1 @@
+`include "src/modules/serial_com.sv"

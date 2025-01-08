@@ -1,5 +1,6 @@
 //~ `New testbench
-`include "counter.sv"
+`include "outputs/synth/counter_synth.sv"
+// `include "src/modules/counter.sv"
 `timescale  1ns / 1ps
 
 module tb_counter;

@@ -1,7 +1,7 @@
 # Makefile for Verilog compilation, simulation, and FPGA synthesis
 
 # Variables
-FILE?= counter.sv
+FILE?= serial_com.sv
 
 
 OUT_FILE = $(FILE:.sv=)_out.vvp
@@ -32,8 +32,9 @@ compile:
 	$(VVP) outputs/compiled/$(OUT_FILE)
 
 
+synthesize:ĄĄĄĄĄĄ
 # Synthesis, place-and-route, and bitstream generation target
-synthesize:
+ĄĄĄĄĄĄ:
 	@echo "Running Yosys synthesis..."
 	$(YOSYS) -p "synth_gowin  -json outputs/synth/$(SYNTH_JSON)" src/modules/$(FILE)
 	@echo "Running nextpnr for place-and-route..."
@@ -41,7 +42,8 @@ synthesize:
                    --write outputs/routed/$(SYNTH_JSON) \
                    --device $(DEVICE) \
 				   --vopt family=$(DEV_FAMILY)\
-                   --vopt cst=src/ucf/$(FILE:.sv=).ucf
+                   --vopt cst=src/ucf/$(FILE:.sv=).ucf\
+				   
 	@echo "Generating bitstream with apycula..."
 	$(APYCULA)  -d $(DEV_FAMILY)  -o outputs/bin/$(BINARY_FILE) outputs/routed/$(SYNTH_JSON)
 
@@ -49,7 +51,7 @@ simulate:
 	@echo "Simulating the design..."
 	yosys -o outputs/synth/$(SYNTH_SV) outputs/synth/$(SYNTH_JSON) 
 	iverilog -o outputs/compiled/$(OUT_FILE) -D POST_SYNTHESIS src/tests/$(TESTBENCH)  outputs/synth/$(SYNTH_SV) `yosys-config --datdir/gowin/cells_sim.v`
-	vvp 
+	vvp outputs/compiled/$(OUT_FILE)
 
 view:
 	gtkwave outputs/sim/$(FILE:.sv=)_data.vcd --script=commands.tcl
