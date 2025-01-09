@@ -61,10 +61,10 @@ module wave_right(
 );  
 
 reg [2:0] state = 3'b000;
-always @(posedge clk or posedge rst) begin
-    if (rst) begin
-        state <= 3'b000;
-    end else begin
+
+always @(posedge rst) begin state <= 3'b000; end
+
+always @(posedge clk) begin
         case (state)
             3'b000: begin
                 state <= 3'b001;
@@ -99,7 +99,6 @@ always @(posedge clk or posedge rst) begin
             end
         endcase
     end
-end
 
 endmodule
 
