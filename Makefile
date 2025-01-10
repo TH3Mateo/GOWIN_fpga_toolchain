@@ -1,7 +1,7 @@
 # Makefile for Verilog compilation, simulation, and FPGA synthesis
 
 # Variables
-FILE?= serial_com.sv
+FILE?= wave_LED.sv
 
 
 OUT_FILE = $(FILE:.sv=)_out.vvp
@@ -54,7 +54,7 @@ simulate:
 	vvp outputs/compiled/$(OUT_FILE)
 
 view:
-	gtkwave outputs/sim/$(FILE:.sv=)_data.vcd --script=commands.tcl
+	gtkwave outputs/sim/$(FILE:.sv=)_data.vcd 
 
 
 

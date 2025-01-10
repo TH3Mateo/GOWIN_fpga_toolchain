@@ -3,10 +3,10 @@ module wave_LED(
     input reg[2:0] signal,
     output reg [5:0] LED
 );
-parameter CLK_FRE = 50000000;
+parameter CLK_FRE = 5;
 parameter led_refresh_s = 0.2;
 reg[15:0] display_counter= 0;
-parameter display_clk_max = CLK_FRE * led_refresh_s;
+parameter integer display_clk_max = CLK_FRE * led_refresh_s;
 reg display_clk;
 reg start_sequence;
 
@@ -21,19 +21,22 @@ wave_up u_inst(.clk(display_clk),.rst(start_sequence),.LED(u_out));
 wave_down d_inst(.clk(display_clk),.rst(start_sequence),.LED(d_out));
 
 
+
 always @(posedge clk) begin
 //make the LED counter tick every led_refresh_s seconds
-    display_counter <= display_counter + 1;
+
     if(display_counter == display_clk_max) begin
         display_clk <= 1;
+        display_counter<=0;
     end
     else begin
+        display_counter = display_counter + 1;
         display_clk <= 0;
     end
 
 end
 
-always @(signal) begin
+always @(posedge clk) begin
     if(signal == 3'b000) begin
         start_sequence <= 0;
     end
@@ -41,10 +44,10 @@ always @(signal) begin
         start_sequence <= 1;
 
         case (signal)
-        3'b000: begin
-            LED <= 6'b000000;
-        end
-            
+        3'b001: LED <= l_out;
+        3'b010: LED <= r_out;
+        3'b011: LED <= u_out;
+        3'b100: LED <= d_out;
         default: LED <= 6'b000000;
         endcase
     end
